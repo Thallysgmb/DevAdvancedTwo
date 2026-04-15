@@ -11,28 +11,34 @@ export default function RegisterScreen({ navigation }) {
   const { register, logout } = useContext(AuthContext);
 
   const handleRegister = async () => {
-    if (!name || !email || !password) {
-      Alert.alert('Erro', 'Preencha todos os campos');
+    // .trim() remove espaços em branco extras
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      Alert.alert('Erro', 'Preencha todos os campos corretamente.');
       return;
     }
 
     setLoading(true);
     try {
       await register(email, password, name);
+      if (logout) await logout(); 
+      Alert.alert(
+        'Sucesso', 
+        'Conta criada com sucesso! Faça login para continuar.',
+        [
+          { 
+            text: 'Ir para Login', 
+            onPress: () => navigation.replace('Login') 
+          }
+        ]
+      );
 
-      
-      await logout(); 
-      Alert.alert('Sucesso', 'Conta criada com sucesso! Faça login para continuar.');
-      navigation.replace('Login');
-      return; 
-
-      Alert.alert('Sucesso', 'Conta criada com sucesso!');
     } catch (error) {
-      Alert.alert('Erro no cadastro', error.message);
+      Alert.alert('Erro no cadastro', error.message || 'Ocorreu um erro inesperado.');
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <View style={styles.container}>
